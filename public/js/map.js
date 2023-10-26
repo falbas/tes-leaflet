@@ -2,7 +2,7 @@ const bounds = [
   [-11, 90],
   [11, 145],
 ]
-const map_be_url = 'http://localhost:3300/api/storage'
+const map_be_url = 'https://falbas.net/api/storage'
 
 const map = L.map('map', {
   center: [-6.17396, 106.8271],
@@ -48,6 +48,9 @@ Promise.all(promises).then(function (arrays) {
       {},
       {
         Wind: windLayer,
+      },
+      {
+        collapsed: false,
       }
     )
     .addTo(map)
