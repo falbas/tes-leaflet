@@ -33,6 +33,14 @@ const baseLayers = date.map((d, i) => {
   }
 })
 
+const bgLayer = L.tileLayer(
+  'http://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png',
+  {
+    attribution:
+      '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  }
+)
+
 const map = L.map('map', {
   center: [-6.17396, 106.8271],
   zoom: 6,
@@ -44,6 +52,7 @@ const map = L.map('map', {
 })
 map.fitBounds(bounds)
 
+bgLayer.addTo(map)
 baseLayers[0].baseLayer.addTo(map)
 
 let activeWindLayer = null
