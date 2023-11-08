@@ -2,9 +2,11 @@ const bounds = [
   [-11, 90],
   [11, 145],
 ]
-const map_be_url = 'https://falbas.net/api/storage'
+// const map_be_url = 'https://falbas.net/api/storage'
+const map_be_url = 'http://localhost:3300/api/storage'
 
-const today = new Date('2023-09-01')
+const today = new Date('2023-11-08')
+today.setHours(0)
 const date = []
 for (let i = 0; i <= 2; i++) {
   const d = new Date(today)
@@ -12,15 +14,21 @@ for (let i = 0; i <= 2; i++) {
   date.push(
     String(d.getFullYear()) +
       String(d.getMonth() + 1).padStart(2, '0') +
-      String(d.getDate()).padStart(2, '0')
+      String(d.getDate()).padStart(2, '0') +
+      String(d.getHours()).padStart(2, '0')
   )
 }
 
 const baseLayers = date.map((d, i) => {
-  windLayerHandler([`${map_be_url}/${d}/U.asc`, `${map_be_url}/${d}/V.asc`], i)
+  windLayerHandler(
+    [`${map_be_url}/${d}/wind/U.asc`, `${map_be_url}/${d}/wind/V.asc`],
+    i
+  )
 
   return {
-    baseLayer: L.tileLayer(`${map_be_url}/${d}/tiles/temp/{z}/{x}/{y}.png`),
+    baseLayer: L.tileLayer(`${map_be_url}/${d}/tc/tiles/{z}/{x}/{y}.png`, {
+      tms: 1,
+    }),
     windLayer: null,
   }
 })
@@ -28,7 +36,7 @@ const baseLayers = date.map((d, i) => {
 const map = L.map('map', {
   center: [-6.17396, 106.8271],
   zoom: 6,
-  minZoom: 6,
+  minZoom: 5.5,
   maxZoom: 10,
   maxBounds: bounds,
   maxBoundsViscosity: 1.0,
@@ -93,7 +101,7 @@ inputDateRange.addEventListener('input', () => {
   layerHandler(baseLayers[parseInt(inputDateRange.value)])
 })
 
-const url_json = '/countries.geo.json'
+const url_json = '/indonesia-bg.geojson'
 const json = fetch(url_json).then((r) => r.text())
 Promise.resolve(json).then((v) => {
   const country = JSON.parse(v)
