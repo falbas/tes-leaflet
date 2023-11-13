@@ -1,5 +1,4 @@
 import Script from 'next/script'
-import Image from 'next/image'
 
 import MapLayerButton from '@/components/MapLayerButton/mapLayerButton'
 import MapLayerContainer from '@/components/MapLayerContainer/mapLayerContainer'
@@ -10,24 +9,29 @@ import windIcon from '~/icons/wind.svg'
 import temperatureIcon from '~/icons/temperature.svg'
 import humidityIcon from '~/icons/humidity.svg'
 import dotIcon from '~/icons/dot.svg'
-import chevronUpIcon from '~/icons/chevron-up.svg'
 
 export default function Home() {
   return (
     <>
       <div id="map" className="relative z-0"></div>
       <div className="absolute top-40 left-4 text-white flex flex-col gap-2">
-        <MapLayerContainer>
-          <MapLayerButton icon={windIcon} text={'Wind'} />
-          <MapLayerButton icon={temperatureIcon} text={'Temperature'} />
-          <MapLayerButton icon={humidityIcon} text={'Humidity'} />
+        <MapLayerContainer id="variableLayerController">
+          <MapLayerButton id="wspd" icon={windIcon} text={'Wind'} />
+          <MapLayerButton id="tc" icon={temperatureIcon} text={'Temperature'} />
+          <MapLayerButton id="rh" icon={humidityIcon} text={'Humidity'} />
+        </MapLayerContainer>
+        <MapLayerContainer id="levelLayerController">
+          <MapLayerButton id="1000" icon={dotIcon} text={'Surface'} />
+          <MapLayerButton id="850" icon={dotIcon} text={'850'} />
+          <MapLayerButton id="700" icon={dotIcon} text={'700'} />
         </MapLayerContainer>
         <MapLayerContainer>
-          <MapLayerButton icon={dotIcon} text={'Surface'} />
-          <MapLayerButton icon={dotIcon} text={'850'} />
-        </MapLayerContainer>
-        <MapLayerContainer>
-          <MapLayerButton icon={dotIcon} text={'Wind Animation'} active />
+          <MapLayerButton
+            id="windAnimationLayerControl"
+            icon={dotIcon}
+            text={'Wind Animation'}
+            active
+          />
         </MapLayerContainer>
       </div>
 

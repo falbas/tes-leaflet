@@ -1,9 +1,4 @@
-const mapBeUrl = 'http://localhost:3300/api'
-
-// L.tileLayer(
-//   `${mapBeUrl}/storage/2023110700/2023110700/1000/tc/tiles/{z}/{x}/{y}.png`,
-//   { tms: true }
-// ).addTo(map)
+const mapBeUrl = 'http://localhost/leaflet-be'
 
 const dateRangeText = document.getElementById('dateRangeText')
 const dateRangeInput = document.getElementById('dateRangeInput')
@@ -11,14 +6,38 @@ const btnPrev = document.getElementById('btnPrev')
 const btnNext = document.getElementById('btnNext')
 const initialTime = document.getElementById('initialTime')
 const initialTimeList = document.getElementById('initialTimeList')
+const variableLayerController = document
+  .getElementById('variableLayerController')
+  .getElementsByTagName('button')
+const levelLayerController = document
+  .getElementById('levelLayerController')
+  .getElementsByTagName('button')
 
-function getDateStr(d) {
-  return (
-    String(d.getFullYear()) +
-    String(d.getMonth() + 1).padStart(2, '0') +
-    String(d.getDate()).padStart(2, '0') +
-    String(d.getHours()).padStart(2, '0')
-  )
+const mapControl = {
+  variable: 'wspd',
+  level: '1000',
+  initialTime: 0,
+  predictionTime: 0,
+  min: 0,
+  max: 24,
+  step: 1,
+  activeLayer: null,
+}
+
+for (let i = 0; i < variableLayerController.length; i++) {
+  variableLayerController[i].addEventListener('click', () => {
+    const activeVariable = variableLayerController[i].getAttribute('id')
+    mapControl.variable = activeVariable
+    changeLayer()
+  })
+}
+
+for (let i = 0; i < levelLayerController.length; i++) {
+  levelLayerController[i].addEventListener('click', () => {
+    const activeLevel = levelLayerController[i].getAttribute('id')
+    mapControl.level = activeLevel
+    changeLayer()
+  })
 }
 
 const prevDayCount = 10
@@ -42,11 +61,10 @@ for (let i = 0; i <= prevDayCount - 1; i++) {
 }
 dates.reverse()
 
-let initialTimeActive = 0
 for (let i = 0; i <= dates.length - 1; i++) {
   if (i === dates.length - 1) {
     initialTime.innerText = getDateStr(dates[i][0])
-    initialTimeActive = i
+    mapControl.initialTime = i
     initialTimeList.innerHTML += `<button onClick="timeControlHandler(${i})" style="padding-left:0.5rem;padding-right:0.5rem;border-radius:0.25rem;background-color:rgb(71 85 105)">${getDateStr(
       dates[i][0]
     )}</button>`
@@ -57,17 +75,10 @@ for (let i = 0; i <= dates.length - 1; i++) {
   }
 }
 
-const dateRange = {
-  value: 0,
-  min: 0,
-  max: 24,
-  step: 1,
-}
-
-let activeLayer = L.tileLayer(
-  `${mapBeUrl}/storage/${getDateStr(dates[initialTimeActive][0])}/${getDateStr(
-    dates[initialTimeActive][dateRange.value]
-  )}/1000/tc/tiles/{z}/{x}/{y}.png`,
+mapControl.activeLayer = L.tileLayer(
+  `${mapBeUrl}/${getDateStr(dates[mapControl.initialTime][0])}/${getDateStr(
+    dates[mapControl.initialTime][mapControl.predictionTime]
+  )}/${mapControl.level}/${mapControl.variable}/tiles/{z}/{x}/{y}.png`,
   { tms: true }
 ).addTo(map)
 
@@ -80,53 +91,45 @@ initialTime.addEventListener('click', () => {
 function timeControlHandler(i) {
   initialTimeList.style.display = 'none'
   initialTime.innerText = getDateStr(dates[i][0])
-  initialTimeList.childNodes[initialTimeActive].style.backgroundColor = null
+  initialTimeList.childNodes[mapControl.initialTime].style.backgroundColor =
+    null
   initialTimeList.childNodes[i].style.backgroundColor = 'rgb(71 85 105)'
-  initialTimeActive = i
+  mapControl.initialTime = i
   dateRangeText.innerText = getDateStr(
-    dates[initialTimeActive][dateRange.value]
+    dates[mapControl.initialTime][mapControl.predictionTime]
   )
 
-  const nextLayer = L.tileLayer(
-    `${mapBeUrl}/storage/${getDateStr(
-      dates[initialTimeActive][0]
-    )}/${getDateStr(
-      dates[initialTimeActive][dateRange.value]
-    )}/1000/tc/tiles/{z}/{x}/{y}.png`,
-    { tms: true }
-  ).addTo(map)
-  activeLayer.remove()
-  activeLayer = nextLayer
+  changeLayer()
 }
 
-dateRangeInput.setAttribute('value', dateRange.value.toString())
-dateRangeInput.setAttribute('min', dateRange.min.toString())
-dateRangeInput.setAttribute('max', dateRange.max.toString())
-dateRangeInput.setAttribute('step', dateRange.step.toString())
+dateRangeInput.setAttribute('value', mapControl.predictionTime.toString())
+dateRangeInput.setAttribute('min', mapControl.min.toString())
+dateRangeInput.setAttribute('max', mapControl.max.toString())
+dateRangeInput.setAttribute('step', mapControl.step.toString())
 
-dateRangeText.innerText = getDateStr(dates[initialTimeActive][0])
+dateRangeText.innerText = getDateStr(dates[mapControl.initialTime][0])
 
 let textPosition = 0
 dateRangeInput.addEventListener('input', () => {
-  dateRange.value = parseInt(dateRangeInput.value)
-  playerHandler(dateRange.value)
+  mapControl.predictionTime = parseInt(dateRangeInput.value)
+  playerHandler(mapControl.predictionTime)
 })
 
 btnNext.addEventListener('click', () => {
-  if (dateRange.value < dateRange.max) {
-    playerHandler((dateRange.value += 1))
+  if (mapControl.predictionTime < mapControl.max) {
+    playerHandler((mapControl.predictionTime += 1))
   }
 })
 
 btnPrev.addEventListener('click', () => {
-  if (dateRange.value > dateRange.min) {
-    playerHandler((dateRange.value -= 1))
+  if (mapControl.predictionTime > mapControl.min) {
+    playerHandler((mapControl.predictionTime -= 1))
   }
 })
 
 function playerHandler(v) {
   dateRangeInput.value = v
-  dateRangeText.innerText = getDateStr(dates[initialTimeActive][v])
+  dateRangeText.innerText = getDateStr(dates[mapControl.initialTime][v])
   textPosition = (v / 24) * 100
   if (textPosition < 50) {
     dateRangeText.style.left = textPosition + '%'
@@ -136,14 +139,33 @@ function playerHandler(v) {
     dateRangeText.style.left = null
   }
 
+  changeLayer()
+}
+
+function getDateStr(d) {
+  return (
+    String(d.getFullYear()) +
+    String(d.getMonth() + 1).padStart(2, '0') +
+    String(d.getDate()).padStart(2, '0') +
+    String(d.getHours()).padStart(2, '0')
+  )
+}
+
+function windAnimationLayerHandler(urls, i) {
+  const promises = urls.map((url) => fetch(url).then((r) => r.text()))
+  Promise.all(promises).then(function (arrays) {
+    const vf = L.VectorField.fromASCIIGrids(arrays[0], arrays[1], 50)
+    baseLayers[i].windLayer = L.canvasLayer.vectorFieldAnim(vf)
+  })
+}
+
+function changeLayer() {
   const nextLayer = L.tileLayer(
-    `${mapBeUrl}/storage/${getDateStr(
-      dates[initialTimeActive][0]
-    )}/${getDateStr(
-      dates[initialTimeActive][dateRange.value]
-    )}/1000/tc/tiles/{z}/{x}/{y}.png`,
+    `${mapBeUrl}/${getDateStr(dates[mapControl.initialTime][0])}/${getDateStr(
+      dates[mapControl.initialTime][mapControl.predictionTime]
+    )}/${mapControl.level}/${mapControl.variable}/tiles/{z}/{x}/{y}.png`,
     { tms: true }
   ).addTo(map)
-  activeLayer.remove()
-  activeLayer = nextLayer
+  mapControl.activeLayer.remove()
+  mapControl.activeLayer = nextLayer
 }

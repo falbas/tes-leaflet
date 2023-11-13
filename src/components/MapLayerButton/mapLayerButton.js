@@ -3,13 +3,20 @@
 import { useState } from 'react'
 import Image from 'next/image'
 
-export default function MapLayerButton({ id, icon, text, active }) {
+export default function MapLayerButton({ id, icon, text, active, onClick }) {
   const [isHover, setIsHover] = useState(false)
+
+  const onClickHandler = () => {
+    if (onClick) {
+      onClick(id)
+    }
+  }
 
   return (
     <>
       <button
         id={id}
+        onClick={onClickHandler}
         onMouseEnter={() => {
           setIsHover(true)
         }}
@@ -17,7 +24,7 @@ export default function MapLayerButton({ id, icon, text, active }) {
           setIsHover(false)
         }}
         className={`flex overflow-hidden before:absolute before:w-6 before:h-8 before:bg-[rgba(0,0,0,0.3)] first:before:rounded-t-full last:before:rounded-b-full ${
-          (isHover || active) && 'before:bg-blue-500'
+          (isHover || active == id) && 'before:bg-blue-500'
         }`}
       >
         <div className="relative">
@@ -25,7 +32,7 @@ export default function MapLayerButton({ id, icon, text, active }) {
         </div>
         <span
           className={`relative -left-2 pl-4 pr-2 text-white rounded-r-full my-auto ${
-            (isHover || active) && 'bg-blue-500'
+            (isHover || active == id) && 'bg-blue-500'
           }`}
         >
           {text}
