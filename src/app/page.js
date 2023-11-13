@@ -2,6 +2,8 @@ import Script from 'next/script'
 
 import MapLayerButton from '@/components/MapLayerButton/mapLayerButton'
 import MapLayerContainer from '@/components/MapLayerContainer/mapLayerContainer'
+import MapLayerCheckButton from '@/components/MapLayerCheckButton/mapLayerCheckButton'
+import MapLayerCheckContainer from '@/components/MapLayerCheckContainer/mapLayerCheckContainer'
 import MapTimeControl from '@/components/MapTimeControl/mapTimeControl'
 import MapPlayer from '@/components/MapPlayer/mapPlayer'
 
@@ -21,18 +23,16 @@ export default function Home() {
           <MapLayerButton id="rh" icon={humidityIcon} text={'Humidity'} />
         </MapLayerContainer>
         <MapLayerContainer id="levelLayerController">
-          <MapLayerButton id="1000" icon={dotIcon} text={'Surface'} />
+          <MapLayerButton id="1000" icon={dotIcon} text={'1000'} />
           <MapLayerButton id="850" icon={dotIcon} text={'850'} />
           <MapLayerButton id="700" icon={dotIcon} text={'700'} />
         </MapLayerContainer>
-        <MapLayerContainer>
-          <MapLayerButton
+        <MapLayerCheckContainer>
+          <MapLayerCheckButton
             id="windAnimationLayerControl"
-            icon={dotIcon}
             text={'Wind Animation'}
-            active
           />
-        </MapLayerContainer>
+        </MapLayerCheckContainer>
       </div>
 
       <div className="absolute bottom-20 bg-[rgba(0,0,0,0.3)] px-4 py-2 text-white">

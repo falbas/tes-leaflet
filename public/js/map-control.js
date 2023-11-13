@@ -12,6 +12,9 @@ const variableLayerController = document
 const levelLayerController = document
   .getElementById('levelLayerController')
   .getElementsByTagName('button')
+const windAnimationLayerControl = document.getElementById(
+  'windAnimationLayerControl'
+)
 
 const mapControl = {
   variable: 'wspd',
@@ -22,6 +25,7 @@ const mapControl = {
   max: 24,
   step: 1,
   activeLayer: null,
+  windLayer: null,
 }
 
 for (let i = 0; i < variableLayerController.length; i++) {
@@ -39,6 +43,14 @@ for (let i = 0; i < levelLayerController.length; i++) {
     changeLayer()
   })
 }
+
+windAnimationLayerControl.addEventListener('click', () => {
+  if (mapControl.windLayer.isVisible()) {
+    mapControl.windLayer.hide()
+  } else {
+    mapControl.windLayer.show()
+  }
+})
 
 const prevDayCount = 10
 const today = new Date('2023-11-08')
@@ -81,6 +93,20 @@ mapControl.activeLayer = L.tileLayer(
   )}/${mapControl.level}/${mapControl.variable}/tiles/{z}/{x}/{y}.png`,
   { tms: true }
 ).addTo(map)
+
+async function setWindLayer() {
+  const uvUrl = [
+    `${mapBeUrl}/${getDateStr(dates[mapControl.initialTime][0])}/${getDateStr(
+      dates[mapControl.initialTime][mapControl.predictionTime]
+    )}/${mapControl.level}/wind/U.asc`,
+    `${mapBeUrl}/${getDateStr(dates[mapControl.initialTime][0])}/${getDateStr(
+      dates[mapControl.initialTime][mapControl.predictionTime]
+    )}/${mapControl.level}/wind/V.asc`,
+  ]
+  mapControl.windLayer = await windAnimationLayerHandler(uvUrl)
+  mapControl.windLayer.addTo(map)
+}
+setWindLayer()
 
 initialTimeList.style.display = 'none'
 initialTime.addEventListener('click', () => {
@@ -151,15 +177,16 @@ function getDateStr(d) {
   )
 }
 
-function windAnimationLayerHandler(urls, i) {
+async function windAnimationLayerHandler(urls) {
   const promises = urls.map((url) => fetch(url).then((r) => r.text()))
-  Promise.all(promises).then(function (arrays) {
+  return Promise.all(promises).then(function (arrays) {
     const vf = L.VectorField.fromASCIIGrids(arrays[0], arrays[1], 50)
-    baseLayers[i].windLayer = L.canvasLayer.vectorFieldAnim(vf)
+    const layer = L.canvasLayer.vectorFieldAnim(vf)
+    return layer
   })
 }
 
-function changeLayer() {
+async function changeLayer() {
   const nextLayer = L.tileLayer(
     `${mapBeUrl}/${getDateStr(dates[mapControl.initialTime][0])}/${getDateStr(
       dates[mapControl.initialTime][mapControl.predictionTime]
@@ -168,4 +195,21 @@ function changeLayer() {
   ).addTo(map)
   mapControl.activeLayer.remove()
   mapControl.activeLayer = nextLayer
+
+  const uvUrl = [
+    `${mapBeUrl}/${getDateStr(dates[mapControl.initialTime][0])}/${getDateStr(
+      dates[mapControl.initialTime][mapControl.predictionTime]
+    )}/${mapControl.level}/wind/U.asc`,
+    `${mapBeUrl}/${getDateStr(dates[mapControl.initialTime][0])}/${getDateStr(
+      dates[mapControl.initialTime][mapControl.predictionTime]
+    )}/${mapControl.level}/wind/V.asc`,
+  ]
+  const nextWindLayer = await windAnimationLayerHandler(uvUrl)
+  nextWindLayer.addTo(map)
+  if (!mapControl.windLayer.isVisible()) {
+    nextWindLayer.hide()
+  }
+  mapControl.windLayer.hide()
+  mapControl.windLayer = nextWindLayer
+  console.log(mapControl.windLayer.isVisible())
 }
