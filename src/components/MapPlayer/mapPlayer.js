@@ -1,6 +1,5 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 
 import leftArrowIcon from '~/icons/left-arrow.svg'
@@ -9,7 +8,7 @@ import rightArrowIcon from '~/icons/right-arrow.svg'
 export default function MapPlayer() {
   return (
     <>
-      <div className="m-4 flex w-full gap-2">
+      <div className="flex w-full gap-2">
         <button id="btnPrev" className="bg-slate-400 rounded-full">
           <Image priority src={leftArrowIcon} alt="" className="h-8 w-8 m-2" />
         </button>

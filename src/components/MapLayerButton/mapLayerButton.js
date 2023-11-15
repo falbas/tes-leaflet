@@ -3,12 +3,22 @@
 import { useState } from 'react'
 import Image from 'next/image'
 
-export default function MapLayerButton({ id, icon, text, active, onClick }) {
+export default function MapLayerButton({
+  id,
+  icon,
+  text,
+  active,
+  activeHandler,
+  onClick,
+}) {
   const [isHover, setIsHover] = useState(false)
 
   const onClickHandler = () => {
     if (onClick) {
-      onClick(id)
+      onClick()
+    }
+    if (activeHandler) {
+      activeHandler(id)
     }
   }
 
