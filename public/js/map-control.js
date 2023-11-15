@@ -147,11 +147,19 @@ function getDateStr(d) {
 }
 
 async function windAnimationLayerHandler(urls) {
-  const promises = urls.map((url) => fetch(url).then((r) => r.text()))
+  const promises = urls.map(async (url) => {
+    try {
+      return await fetch(url).then((r) => r.text())
+    } catch (err) {}
+  })
   return Promise.all(promises).then(function (arrays) {
-    const vf = L.VectorField.fromASCIIGrids(arrays[0], arrays[1], 50)
-    const layer = L.canvasLayer.vectorFieldAnim(vf)
-    return layer
+    try {
+      const vf = L.VectorField.fromASCIIGrids(arrays[0], arrays[1], 50)
+      const layer = L.canvasLayer.vectorFieldAnim(vf)
+      return layer
+    } catch (err) {
+      return null
+    }
   })
 }
 
@@ -161,7 +169,8 @@ async function changeLayer() {
       mapControl.predictionTime[mapControl.predictionTimeActive]
     )}/${mapControl.level}/${mapControl.variable}/tiles/{z}/{x}/{y}.png`,
     { tms: true }
-  ).addTo(map)
+  )
+  nextLayer.addTo(map)
   mapControl.activeLayer = nextLayer
 
   const uvUrl = [
@@ -173,12 +182,21 @@ async function changeLayer() {
     )}/${mapControl.level}/wind/V.asc`,
   ]
   const nextWindLayer = await windAnimationLayerHandler(uvUrl)
-  nextWindLayer.addTo(map)
-  if (!mapControl.windLayer.isVisible()) {
-    nextWindLayer.hide()
+  if (nextWindLayer !== null) {
+    nextWindLayer.addTo(map)
+    if (mapControl.windLayer !== null) {
+      if (!mapControl.windLayer.isVisible()) {
+        nextWindLayer.hide()
+      }
+      mapControl.windLayer.hide()
+    }
+    mapControl.windLayer = nextWindLayer
+  } else {
+    if (mapControl.windLayer !== null) {
+      mapControl.windLayer.hide()
+    }
+    mapControl.windLayer = null
   }
-  mapControl.windLayer.hide()
-  mapControl.windLayer = nextWindLayer
 }
 
 function predTimeHandler() {
