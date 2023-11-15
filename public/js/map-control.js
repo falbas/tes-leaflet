@@ -4,8 +4,6 @@ const dateRangeText = document.getElementById('dateRangeText')
 const dateRangeInput = document.getElementById('dateRangeInput')
 const btnPrev = document.getElementById('btnPrev')
 const btnNext = document.getElementById('btnNext')
-const initialTime = document.getElementById('initialTime')
-const initialTimeList = document.getElementById('initialTimeList')
 const variableLayerController = document
   .getElementById('variableLayerController')
   .getElementsByTagName('button')
@@ -15,18 +13,29 @@ const levelLayerController = document
 const windAnimationLayerControl = document.getElementById(
   'windAnimationLayerControl'
 )
+const initialTime = document.getElementById('initialTime')
+const initialHour = document.getElementById('initialHour')
+const initialTimeList = document
+  .getElementById('initialTimeList')
+  .getElementsByTagName('button')
+const initialHourList = document
+  .getElementById('initialHourList')
+  .getElementsByTagName('button')
 
 const mapControl = {
   variable: 'wspd',
   level: '1000',
-  initialTime: 0,
-  predictionTime: 0,
+  initialTime: initialTime.value + initialHour.value,
+  predictionTimeActive: 0,
+  predictionTime: [],
   min: 0,
   max: 24,
   step: 1,
   activeLayer: null,
   windLayer: null,
 }
+
+predTimeHandler()
 
 for (let i = 0; i < variableLayerController.length; i++) {
   variableLayerController[i].addEventListener('click', () => {
@@ -52,55 +61,20 @@ windAnimationLayerControl.addEventListener('click', () => {
   }
 })
 
-const prevDayCount = 10
-const today = new Date('2023-11-08')
-today.setHours(0)
-// const today = new Date()
-// today.setHours(12)
-let d = new Date(today)
-const dates = []
-for (let i = 0; i <= prevDayCount - 1; i++) {
-  let dt = []
-  let dd = new Date(d)
-  for (let j = 0; j < 25; j++) {
-    dt.push(dd)
-    dd = new Date(dd)
-    dd.setHours(dd.getHours() + 3)
-  }
-  dates.push(dt)
-  d = new Date(d)
-  d.setHours(d.getHours() - 12)
-}
-dates.reverse()
-
-for (let i = 0; i <= dates.length - 1; i++) {
-  if (i === dates.length - 1) {
-    initialTime.innerText = getDateStr(dates[i][0])
-    mapControl.initialTime = i
-    initialTimeList.innerHTML += `<button onClick="timeControlHandler(${i})" style="padding-left:0.5rem;padding-right:0.5rem;border-radius:0.25rem;background-color:rgb(71 85 105)">${getDateStr(
-      dates[i][0]
-    )}</button>`
-  } else {
-    initialTimeList.innerHTML += `<button onClick="timeControlHandler(${i})" style="padding-left:0.5rem;padding-right:0.5rem;border-radius:0.25rem">${getDateStr(
-      dates[i][0]
-    )}</button>`
-  }
-}
-
 mapControl.activeLayer = L.tileLayer(
-  `${mapBeUrl}/${getDateStr(dates[mapControl.initialTime][0])}/${getDateStr(
-    dates[mapControl.initialTime][mapControl.predictionTime]
+  `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
+    mapControl.predictionTime[mapControl.predictionTimeActive]
   )}/${mapControl.level}/${mapControl.variable}/tiles/{z}/{x}/{y}.png`,
   { tms: true }
 ).addTo(map)
 
 async function setWindLayer() {
   const uvUrl = [
-    `${mapBeUrl}/${getDateStr(dates[mapControl.initialTime][0])}/${getDateStr(
-      dates[mapControl.initialTime][mapControl.predictionTime]
+    `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
+      mapControl.predictionTime[mapControl.predictionTimeActive]
     )}/${mapControl.level}/wind/U.asc`,
-    `${mapBeUrl}/${getDateStr(dates[mapControl.initialTime][0])}/${getDateStr(
-      dates[mapControl.initialTime][mapControl.predictionTime]
+    `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
+      mapControl.predictionTime[mapControl.predictionTimeActive]
     )}/${mapControl.level}/wind/V.asc`,
   ]
   mapControl.windLayer = await windAnimationLayerHandler(uvUrl)
@@ -108,54 +82,50 @@ async function setWindLayer() {
 }
 setWindLayer()
 
-initialTimeList.style.display = 'none'
-initialTime.addEventListener('click', () => {
-  initialTimeList.style.display =
-    initialTimeList.style.display === 'flex' ? 'none' : 'flex'
-})
-
-function timeControlHandler(i) {
-  initialTimeList.style.display = 'none'
-  initialTime.innerText = getDateStr(dates[i][0])
-  initialTimeList.childNodes[mapControl.initialTime].style.backgroundColor =
-    null
-  initialTimeList.childNodes[i].style.backgroundColor = 'rgb(71 85 105)'
-  mapControl.initialTime = i
-  dateRangeText.innerText = getDateStr(
-    dates[mapControl.initialTime][mapControl.predictionTime]
-  )
-
-  changeLayer()
+for (let i = 0; i < initialTimeList.length; i++) {
+  initialTimeList[i].addEventListener('click', () => {
+    mapControl.initialTime = initialTimeList[i].value + initialHour.value
+    predTimeHandler()
+    changeLayer()
+  })
 }
 
-dateRangeInput.setAttribute('value', mapControl.predictionTime.toString())
+for (let i = 0; i < initialHourList.length; i++) {
+  initialHourList[i].addEventListener('click', () => {
+    mapControl.initialTime = initialTime.value + initialHourList[i].value
+    predTimeHandler()
+    changeLayer()
+  })
+}
+
+dateRangeInput.setAttribute('value', mapControl.predictionTimeActive.toString())
 dateRangeInput.setAttribute('min', mapControl.min.toString())
 dateRangeInput.setAttribute('max', mapControl.max.toString())
 dateRangeInput.setAttribute('step', mapControl.step.toString())
 
-dateRangeText.innerText = getDateStr(dates[mapControl.initialTime][0])
-
 let textPosition = 0
 dateRangeInput.addEventListener('input', () => {
-  mapControl.predictionTime = parseInt(dateRangeInput.value)
-  playerHandler(mapControl.predictionTime)
+  mapControl.predictionTimeActive = parseInt(dateRangeInput.value)
+  playerHandler(mapControl.predictionTimeActive)
 })
 
 btnNext.addEventListener('click', () => {
-  if (mapControl.predictionTime < mapControl.max) {
-    playerHandler((mapControl.predictionTime += 1))
+  if (mapControl.predictionTimeActive < mapControl.max) {
+    playerHandler((mapControl.predictionTimeActive += 1))
   }
 })
 
 btnPrev.addEventListener('click', () => {
-  if (mapControl.predictionTime > mapControl.min) {
-    playerHandler((mapControl.predictionTime -= 1))
+  if (mapControl.predictionTimeActive > mapControl.min) {
+    playerHandler((mapControl.predictionTimeActive -= 1))
   }
 })
 
 function playerHandler(v) {
   dateRangeInput.value = v
-  dateRangeText.innerText = getDateStr(dates[mapControl.initialTime][v])
+  dateRangeText.innerText = getDateStr(
+    mapControl.predictionTime[mapControl.predictionTimeActive]
+  )
   textPosition = (v / 24) * 100
   if (textPosition < 50) {
     dateRangeText.style.left = textPosition + '%'
@@ -164,7 +134,6 @@ function playerHandler(v) {
     dateRangeText.style.right = 100 - textPosition + '%'
     dateRangeText.style.left = null
   }
-
   changeLayer()
 }
 
@@ -188,20 +157,19 @@ async function windAnimationLayerHandler(urls) {
 
 async function changeLayer() {
   const nextLayer = L.tileLayer(
-    `${mapBeUrl}/${getDateStr(dates[mapControl.initialTime][0])}/${getDateStr(
-      dates[mapControl.initialTime][mapControl.predictionTime]
+    `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
+      mapControl.predictionTime[mapControl.predictionTimeActive]
     )}/${mapControl.level}/${mapControl.variable}/tiles/{z}/{x}/{y}.png`,
     { tms: true }
   ).addTo(map)
-  mapControl.activeLayer.remove()
   mapControl.activeLayer = nextLayer
 
   const uvUrl = [
-    `${mapBeUrl}/${getDateStr(dates[mapControl.initialTime][0])}/${getDateStr(
-      dates[mapControl.initialTime][mapControl.predictionTime]
+    `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
+      mapControl.predictionTime[mapControl.predictionTimeActive]
     )}/${mapControl.level}/wind/U.asc`,
-    `${mapBeUrl}/${getDateStr(dates[mapControl.initialTime][0])}/${getDateStr(
-      dates[mapControl.initialTime][mapControl.predictionTime]
+    `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
+      mapControl.predictionTime[mapControl.predictionTimeActive]
     )}/${mapControl.level}/wind/V.asc`,
   ]
   const nextWindLayer = await windAnimationLayerHandler(uvUrl)
@@ -211,5 +179,19 @@ async function changeLayer() {
   }
   mapControl.windLayer.hide()
   mapControl.windLayer = nextWindLayer
-  console.log(mapControl.windLayer.isVisible())
+}
+
+function predTimeHandler() {
+  mapControl.predictionTime = []
+  for (let i = 0, j = 0; i < 25; i++, j += 3) {
+    let ds = mapControl.initialTime
+    ds = `${ds.substring(0, 4)}-${ds.substring(4, 6)}-${ds.substring(6, 8)}`
+    let d = new Date(ds)
+    d.setHours(mapControl.initialTime.substring(8, 10))
+    d.setHours(d.getHours() + j)
+    mapControl.predictionTime.push(d)
+  }
+  dateRangeText.innerText = getDateStr(
+    mapControl.predictionTime[mapControl.predictionTimeActive]
+  )
 }

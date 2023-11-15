@@ -50,7 +50,7 @@ export default function Home() {
       <Script src="//d3js.org/d3.v4.min.js" />
       <Script src="/js/leaflet.canvaslayer.field.js" />
       <Script src="/js/map.js" />
-      <Script src="/js/map-control.js" />
+      <Script src="/js/map-control.js" strategy='lazyOnload'/>
     </>
   )
 }
