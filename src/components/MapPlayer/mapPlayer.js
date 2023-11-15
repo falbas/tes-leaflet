@@ -7,26 +7,6 @@ import leftArrowIcon from '~/icons/left-arrow.svg'
 import rightArrowIcon from '~/icons/right-arrow.svg'
 
 export default function MapPlayer() {
-  // const dateRangeText = useRef()
-  // const dateRange = useRef()
-  // const [rangeValue, setRangeValue] = useState(0)
-  // const [pointerPos, setPointterPos] = useState(0)
-
-  // useEffect(() => {
-  //   if (pointerPos < 50) {
-  //     dateRangeText.current.style.left = pointerPos + '%'
-  //     dateRangeText.current.style.right = null
-  //   } else {
-  //     dateRangeText.current.style.right = 100 - pointerPos + '%'
-  //     dateRangeText.current.style.left = null
-  //   }
-  // }, [pointerPos, rangeValue])
-
-  // function rangeHandler(v) {
-  //   setRangeValue(v)
-  //   setPointterPos((v / 24) * 100)
-  // }
-
   return (
     <>
       <div className="m-4 flex w-full gap-2">
@@ -51,27 +31,6 @@ export default function MapPlayer() {
               type="range"
               className="w-full"
             />
-            {/* <div className="w-full flex relative h-6">
-              <div
-                ref={dateRangeText}
-                className="flex-none absolute bg-slate-400 px-2 rounded cursor-pointer"
-              >
-                <span>{Math.floor(rangeValue)}</span>
-              </div>
-            </div>
-            <input
-              ref={dateRange}
-              id="dateRange"
-              type="range"
-              min="0"
-              max="24"
-              step="0.01"
-              value={rangeValue}
-              onChange={(e) => {
-                rangeHandler(e.target.value)
-              }}
-              className="w-full"
-            /> */}
           </div>
         </div>
       </div>

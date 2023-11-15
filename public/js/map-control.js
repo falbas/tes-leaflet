@@ -123,7 +123,7 @@ btnPrev.addEventListener('click', () => {
 
 function playerHandler(v) {
   dateRangeInput.value = v
-  dateRangeText.innerText = getDateStr(
+  dateRangeText.innerText = getWibStr(
     mapControl.predictionTime[mapControl.predictionTimeActive]
   )
   textPosition = (v / 24) * 100
@@ -144,6 +144,20 @@ function getDateStr(d) {
     String(d.getDate()).padStart(2, '0') +
     String(d.getHours()).padStart(2, '0')
   )
+}
+
+function getWibStr(d) {
+  const dd = new Date(d)
+  dd.setHours(dd.getHours() + 7)
+  const day = dd.getDate()
+  // prettier-ignore
+  const monthNames = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+  ];
+  const month = monthNames[dd.getMonth()]
+  const hours = String(dd.getHours()).padStart(2, '0')
+  const minutes = String(dd.getMinutes()).padStart(2, '0')
+  return `${day} ${month} ${hours}:${minutes}`
 }
 
 async function windAnimationLayerHandler(urls) {
@@ -209,7 +223,7 @@ function predTimeHandler() {
     d.setHours(d.getHours() + j)
     mapControl.predictionTime.push(d)
   }
-  dateRangeText.innerText = getDateStr(
+  dateRangeText.innerText = getWibStr(
     mapControl.predictionTime[mapControl.predictionTimeActive]
   )
 }
