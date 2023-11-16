@@ -1,4 +1,4 @@
-const mapBeUrl = 'http://localhost/leaflet-be'
+const mapBeUrl = 'http://localhost/leaflet-be/tmp2'
 
 const dateRangeText = document.getElementById('dateRangeText')
 const dateRangeInput = document.getElementById('dateRangeInput')
@@ -69,15 +69,7 @@ mapControl.activeLayer = L.tileLayer(
 ).addTo(map)
 
 async function setWindLayer() {
-  const uvUrl = [
-    `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
-      mapControl.predictionTime[mapControl.predictionTimeActive]
-    )}/${mapControl.level}/wind/U.asc`,
-    `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
-      mapControl.predictionTime[mapControl.predictionTimeActive]
-    )}/${mapControl.level}/wind/V.asc`,
-  ]
-  mapControl.windLayer = await windAnimationLayerHandler(uvUrl)
+  mapControl.windLayer = await windAnimationLayerHandler()
   mapControl.windLayer.addTo(map)
 }
 setWindLayer()
@@ -160,15 +152,24 @@ function getWibStr(d) {
   return `${day} ${month} ${hours}:${minutes}`
 }
 
-async function windAnimationLayerHandler(urls) {
-  const promises = urls.map(async (url) => {
+async function windAnimationLayerHandler() {
+  const uvUrl = [
+    `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
+      mapControl.predictionTime[mapControl.predictionTimeActive]
+    )}/${mapControl.level}/u/u.tif`,
+    `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
+      mapControl.predictionTime[mapControl.predictionTimeActive]
+    )}/${mapControl.level}/v/v.tif`,
+  ]
+
+  const promises = uvUrl.map(async (url) => {
     try {
-      return await fetch(url).then((r) => r.text())
+      return await fetch(url).then((r) => r.arrayBuffer())
     } catch (err) {}
   })
   return Promise.all(promises).then(function (arrays) {
     try {
-      const vf = L.VectorField.fromASCIIGrids(arrays[0], arrays[1], 50)
+      const vf = L.VectorField.fromGeoTIFFs(arrays[0], arrays[1], 50)
       const layer = L.canvasLayer.vectorFieldAnim(vf)
       return layer
     } catch (err) {
@@ -187,15 +188,7 @@ async function changeLayer() {
   nextLayer.addTo(map)
   mapControl.activeLayer = nextLayer
 
-  const uvUrl = [
-    `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
-      mapControl.predictionTime[mapControl.predictionTimeActive]
-    )}/${mapControl.level}/wind/U.asc`,
-    `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
-      mapControl.predictionTime[mapControl.predictionTimeActive]
-    )}/${mapControl.level}/wind/V.asc`,
-  ]
-  const nextWindLayer = await windAnimationLayerHandler(uvUrl)
+  const nextWindLayer = await windAnimationLayerHandler()
   if (nextWindLayer !== null) {
     nextWindLayer.addTo(map)
     if (mapControl.windLayer !== null) {
