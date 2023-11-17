@@ -15,7 +15,7 @@ export default function MapTimeControl() {
 
   useEffect(() => {
     const it = []
-    let date = new Date('2023-11-08')
+    let date = new Date('2023-11-14')
     for (let i = 0; i < 10; i++) {
       it.unshift(date)
       let d = new Date(date)

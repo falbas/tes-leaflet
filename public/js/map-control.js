@@ -69,8 +69,11 @@ mapControl.activeLayer = L.tileLayer(
 ).addTo(map)
 
 async function setWindLayer() {
-  mapControl.windLayer = await windAnimationLayerHandler()
-  mapControl.windLayer.addTo(map)
+  const layer = await windAnimationLayerHandler()
+  if (layer !== null) {
+    mapControl.windLayer = layer
+    mapControl.windLayer.addTo(map)
+  }
 }
 setWindLayer()
 
