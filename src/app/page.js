@@ -82,10 +82,8 @@ export default function Home() {
       <Script src="//d3js.org/d3.v4.min.js" />
       <Script src="//npmcdn.com/geotiff@0.3.6/dist/geotiff.js" />
       <Script src="/js/leaflet.canvaslayer.field.js" />
-      {/* <Script src="http://localhost:8080/dist/leaflet.canvaslayer.field.js" /> */}
-      <Script src="/js/map.js" />
+      <Script src="/js/map.js" strategy="lazyOnload" />
       <Script src="/js/map-control.js" strategy="lazyOnload" />
-      {/* <Script src="/js/tes-wind.js" strategy="lazyOnload" /> */}
     </>
   )
 }

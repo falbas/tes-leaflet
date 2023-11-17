@@ -1,4 +1,4 @@
-const mapBeUrl = 'http://localhost/leaflet-be/tmp2'
+const mapBeUrl = 'https://falbas.net/tiles'
 
 const dateRangeText = document.getElementById('dateRangeText')
 const dateRangeInput = document.getElementById('dateRangeInput')
@@ -64,7 +64,7 @@ windAnimationLayerControl.addEventListener('click', () => {
 mapControl.activeLayer = L.tileLayer(
   `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
     mapControl.predictionTime[mapControl.predictionTimeActive]
-  )}/${mapControl.level}/${mapControl.variable}/tiles/{z}/{x}/{y}.png`,
+  )}/${mapControl.level}/${mapControl.variable}/{z}/{x}/{y}.png`,
   { tms: true }
 ).addTo(map)
 
@@ -182,7 +182,7 @@ async function changeLayer() {
   const nextLayer = L.tileLayer(
     `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
       mapControl.predictionTime[mapControl.predictionTimeActive]
-    )}/${mapControl.level}/${mapControl.variable}/tiles/{z}/{x}/{y}.png`,
+    )}/${mapControl.level}/${mapControl.variable}/{z}/{x}/{y}.png`,
     { tms: true }
   )
   nextLayer.addTo(map)
@@ -220,3 +220,67 @@ function predTimeHandler() {
     mapControl.predictionTime[mapControl.predictionTimeActive]
   )
 }
+
+async function onClickLayerHandler(e) {
+  const uvUrl = [
+    `/xlat.tif`,
+    `/xlong.tif`,
+    `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
+      mapControl.predictionTime[mapControl.predictionTimeActive]
+    )}/${mapControl.level}/${mapControl.variable}/${mapControl.variable}.tif`,
+  ]
+
+  const promises = uvUrl.map(async (url) => {
+    try {
+      return await fetch(url).then((r) => r.arrayBuffer())
+    } catch (err) {}
+  })
+  return Promise.all(promises).then(function (arrays) {
+    const vf = L.VectorField.fromGeoTIFFs(arrays[0], arrays[1])
+    const v = L.ScalarField.fromGeoTIFF(arrays[2])
+    const latlon = vf.grid
+    const vv = v.grid
+
+    let nlat = 9999
+    for (let i = 0; i < latlon.length; i++) {
+      if (nlat >= Math.abs(latlon[i][0].u - e.latlng.lat)) {
+        nlat = Math.abs(latlon[i][0].u - e.latlng.lat)
+      } else {
+        nlat = i
+        break
+      }
+    }
+    let nlon = 9999
+    for (let i = 0; i < latlon[0].length; i++) {
+      if (nlon >= Math.abs(latlon[0][i].v - e.latlng.lng)) {
+        nlon = Math.abs(latlon[0][i].v - e.latlng.lng)
+      } else {
+        nlon = i
+        break
+      }
+    }
+    return vv[nlat][nlon]
+  })
+}
+
+map.on('click', async (e) => {
+  const v = await onClickLayerHandler(e)
+
+  let unit
+  switch (mapControl.variable) {
+    case 'wspd':
+      unit = 'm/s'
+      break
+    case 'tc':
+      unit = 'c'
+      break
+    case 'rh':
+      unit = '%'
+      break
+  }
+
+  const popup = L.popup()
+    .setLatLng(e.latlng)
+    .setContent(`${Math.round(v)} ${unit}`)
+    .openOn(map)
+})
