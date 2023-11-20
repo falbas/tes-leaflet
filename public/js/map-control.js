@@ -1,4 +1,6 @@
-const mapBeUrl = 'https://falbas.net/tiles'
+import { map } from './map'
+
+const mapBeUrl = process.env.NEXT_PUBLIC_TILES_URL
 
 const dateRangeText = document.getElementById('dateRangeText')
 const dateRangeInput = document.getElementById('dateRangeInput')
@@ -61,7 +63,7 @@ windAnimationLayerControl.addEventListener('click', () => {
   }
 })
 
-mapControl.activeLayer = L.tileLayer(
+mapControl.activeLayer = window.L.tileLayer(
   `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
     mapControl.predictionTime[mapControl.predictionTimeActive]
   )}/${mapControl.level}/${mapControl.variable}/{z}/{x}/{y}.png`,
@@ -172,8 +174,8 @@ async function windAnimationLayerHandler() {
   })
   return Promise.all(promises).then(function (arrays) {
     try {
-      const vf = L.VectorField.fromGeoTIFFs(arrays[0], arrays[1], 50)
-      const layer = L.canvasLayer.vectorFieldAnim(vf)
+      const vf = window.L.VectorField.fromGeoTIFFs(arrays[0], arrays[1], 50)
+      const layer = window.L.canvasLayer.vectorFieldAnim(vf)
       return layer
     } catch (err) {
       return null
@@ -182,7 +184,7 @@ async function windAnimationLayerHandler() {
 }
 
 async function changeLayer() {
-  const nextLayer = L.tileLayer(
+  const nextLayer = window.L.tileLayer(
     `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
       mapControl.predictionTime[mapControl.predictionTimeActive]
     )}/${mapControl.level}/${mapControl.variable}/{z}/{x}/{y}.png`,
@@ -239,8 +241,8 @@ async function onClickLayerHandler(e) {
     } catch (err) {}
   })
   return Promise.all(promises).then(function (arrays) {
-    const vf = L.VectorField.fromGeoTIFFs(arrays[0], arrays[1])
-    const v = L.ScalarField.fromGeoTIFF(arrays[2])
+    const vf = window.L.VectorField.fromGeoTIFFs(arrays[0], arrays[1])
+    const v = window.L.ScalarField.fromGeoTIFF(arrays[2])
     const latlon = vf.grid
     const vv = v.grid
 
@@ -282,7 +284,7 @@ map.on('click', async (e) => {
       break
   }
 
-  const popup = L.popup()
+  const popup = window.L.popup()
     .setLatLng(e.latlng)
     .setContent(`${Math.round(v)} ${unit}`)
     .openOn(map)

@@ -47,3 +47,5 @@ const labelLayer = L.tileLayer(
   'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png',
   { pane: 'labels' }
 ).addTo(map)
+
+export { map }
