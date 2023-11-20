@@ -81,9 +81,10 @@ export default function Home() {
       <Script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" />
       <Script src="//d3js.org/d3.v4.min.js" />
       <Script src="//npmcdn.com/geotiff@0.3.6/dist/geotiff.js" />
-      <Script src="/js/leaflet.canvaslayer.field.js" />
-      <Script src="/js/map.js" strategy="lazyOnload" />
-      <Script src="/js/map-control.js" strategy="lazyOnload" />
+      {/* <Script src="/js/leaflet.canvaslayer.field.js" /> */}
+      {/* <Script src="/js/map.js" strategy="lazyOnload" /> */}
+      {/* <Script src="/js/map-control.js" strategy="lazyOnload" /> */}
+      <Script src="/dist/main.js" strategy="lazyOnload" />
     </>
   )
 }
