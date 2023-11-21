@@ -20,8 +20,8 @@ map.createPane('labels')
 map.getPane('labels').style.zIndex = 650
 map.getPane('labels').style.pointerEvents = 'none'
 
-const bgLayer = L.tileLayer(
-  'http://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png',
+L.tileLayer(
+  'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png',
   {
     attribution:
       '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy; <a href="https://carto.com/attributions">CARTO</a>',
@@ -43,7 +43,7 @@ Promise.resolve(fetch('/indonesia-bg.geojson').then((r) => r.text())).then(
   }
 )
 
-const labelLayer = L.tileLayer(
+L.tileLayer(
   'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png',
   { pane: 'labels' }
 ).addTo(map)

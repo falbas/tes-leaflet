@@ -284,7 +284,7 @@ map.on('click', async (e) => {
       break
   }
 
-  const popup = window.L.popup()
+  window.L.popup()
     .setLatLng(e.latlng)
     .setContent(`${Math.round(v)} ${unit}`)
     .openOn(map)
