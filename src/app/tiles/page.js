@@ -17,7 +17,7 @@ import humidityIcon from '~/icons/humidity.svg'
 import dotIcon from '~/icons/dot.svg'
 
 export default function Home() {
-  const [colorbar, setColorbar] = useState('/wspd_color.txt')
+  const [colorbar, setColorbar] = useState('/assets/wspd_color.txt')
 
   const colorbarHandler = (c) => {
     setColorbar(c)
@@ -33,7 +33,7 @@ export default function Home() {
             icon={windIcon}
             text={'Wind'}
             onClick={() => {
-              colorbarHandler('/wspd_color.txt')
+              colorbarHandler('/assets/wspd_color.txt')
             }}
           />
           <MapLayerButton
@@ -41,7 +41,7 @@ export default function Home() {
             icon={temperatureIcon}
             text={'Temperature'}
             onClick={() => {
-              colorbarHandler('/tc_color.txt')
+              colorbarHandler('/assets/tc_color.txt')
             }}
           />
           <MapLayerButton
@@ -49,7 +49,7 @@ export default function Home() {
             icon={humidityIcon}
             text={'Humidity'}
             onClick={() => {
-              colorbarHandler('/rh_color.txt')
+              colorbarHandler('/assets/rh_color.txt')
             }}
           />
         </MapLayerContainer>
@@ -81,7 +81,9 @@ export default function Home() {
       <Script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" />
       <Script src="//d3js.org/d3.v4.min.js" />
       <Script src="//npmcdn.com/geotiff@0.3.6/dist/geotiff.js" />
-      <Script src="/dist/main.js" strategy="lazyOnload" />
+      <Script src="/js/leaflet.canvaslayer.field.js" />
+      <Script src="/js/map.js" strategy="lazyOnload" />
+      <Script src="/js/map-control.js" strategy="lazyOnload" />
     </>
   )
 }

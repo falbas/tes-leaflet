@@ -1,6 +1,4 @@
-import { map } from './map'
-
-const mapBeUrl = process.env.NEXT_PUBLIC_TILES_URL
+const mapBeUrl = 'https://storage.googleapis.com/tiles-pi-project-392410'
 
 const dateRangeText = document.getElementById('dateRangeText')
 const dateRangeInput = document.getElementById('dateRangeInput')
@@ -228,8 +226,8 @@ function predTimeHandler() {
 
 async function onClickLayerHandler(e) {
   const uvUrl = [
-    `/xlat.tif`,
-    `/xlong.tif`,
+    `/assets/xlat.tif`,
+    `/assets/xlong.tif`,
     `${mapBeUrl}/${mapControl.initialTime}/${getDateStr(
       mapControl.predictionTime[mapControl.predictionTimeActive]
     )}/${mapControl.level}/${mapControl.variable}/${mapControl.variable}.tif`,

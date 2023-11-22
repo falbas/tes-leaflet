@@ -13,6 +13,9 @@ const map = L.map('map', {
   zoomControl: false,
 })
 map.fitBounds(bounds)
+map.createPane('variable')
+map.getPane('variable').style.zIndex = 200
+map.getPane('variable').style.pointerEvents = 'none'
 map.createPane('country-line')
 map.getPane('country-line').style.zIndex = 640
 map.getPane('country-line').style.pointerEvents = 'none'
@@ -28,7 +31,7 @@ L.tileLayer(
   }
 ).addTo(map)
 
-Promise.resolve(fetch('/indonesia-bg.geojson').then((r) => r.text())).then(
+Promise.resolve(fetch('/assets/indonesia-bg.geojson').then((r) => r.text())).then(
   (v) => {
     const country = JSON.parse(v)
     L.geoJson(country, {
@@ -47,5 +50,3 @@ L.tileLayer(
   'https://{s}.basemaps.cartocdn.com/light_only_labels/{z}/{x}/{y}.png',
   { pane: 'labels' }
 ).addTo(map)
-
-export { map }
