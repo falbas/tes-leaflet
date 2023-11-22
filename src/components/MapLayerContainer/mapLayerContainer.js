@@ -12,8 +12,12 @@ export default function MapLayerContainer({ children, className, id }) {
   const [activeChildren, setActiveChildren] = useState(null)
 
   useEffect(() => {
-    const firstChild = Children.toArray(children)
-    setActiveChildren(firstChild[0].props.id)
+    setActiveChildren(Children.toArray(children)[0].props.id)
+    Children.toArray(children).map((item) => {
+      if (item.props.active) {
+        setActiveChildren(item.props.id)
+      }
+    })
   }, [])
 
   const executeFunction = (id) => {
@@ -26,7 +30,7 @@ export default function MapLayerContainer({ children, className, id }) {
         {Children.map(children, (child) => {
           if (isValidElement(child)) {
             return cloneElement(child, {
-              active: activeChildren,
+              isActive: activeChildren,
               activeHandler: executeFunction,
             })
           }

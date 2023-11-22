@@ -7,9 +7,10 @@ export default function MapLayerButton({
   id,
   icon,
   text,
-  active,
+  isActive,
   activeHandler,
   onClick,
+  active = false,
 }) {
   const [isHover, setIsHover] = useState(false)
 
@@ -34,7 +35,7 @@ export default function MapLayerButton({
           setIsHover(false)
         }}
         className={`flex overflow-hidden before:absolute before:w-6 before:h-8 before:bg-[rgba(0,0,0,0.3)] first:before:rounded-t-full last:before:rounded-b-full ${
-          (isHover || active == id) && 'before:bg-blue-500'
+          (isHover || isActive == id) && 'before:bg-blue-500'
         }`}
       >
         <div className="relative">
@@ -42,7 +43,7 @@ export default function MapLayerButton({
         </div>
         <span
           className={`relative -left-2 pl-4 pr-2 text-white rounded-r-full my-auto ${
-            (isHover || active == id) && 'bg-blue-500'
+            (isHover || isActive == id) && 'bg-blue-500'
           }`}
         >
           {text}

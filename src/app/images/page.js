@@ -54,9 +54,9 @@ export default function Home() {
           />
         </MapLayerContainer>
         <MapLayerContainer id="levelLayerController">
-          <MapLayerButton id="1000" icon={dotIcon} text={'1000'} />
-          <MapLayerButton id="850" icon={dotIcon} text={'850'} />
           <MapLayerButton id="700" icon={dotIcon} text={'700'} />
+          <MapLayerButton id="850" icon={dotIcon} text={'850'} />
+          <MapLayerButton id="1000" icon={dotIcon} text={'1000'} active />
         </MapLayerContainer>
         <MapLayerCheckContainer>
           <MapLayerCheckButton
